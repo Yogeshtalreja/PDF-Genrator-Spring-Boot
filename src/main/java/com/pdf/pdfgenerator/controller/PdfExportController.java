@@ -1,0 +1,36 @@
+package com.pdf.pdfgenerator.controller;
+
+import com.pdf.pdfgenerator.service.PdfGeneratorService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+@Controller
+public class PdfExportController {
+
+    private final PdfGeneratorService pdfGeneratorService;
+
+    public PdfExportController(PdfGeneratorService pdfGeneratorService) {
+        this.pdfGeneratorService = pdfGeneratorService;
+    }
+
+    @GetMapping("/pdf/generate")
+    public void generatePdf(HttpServletResponse response) throws IOException {
+
+        response.setContentType("application/pdf");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd:hh:mm:ss");
+        String currentDateTime = dateFormat.format(new Date());
+
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=pdf_"+currentDateTime+".pdf";
+        response.setHeader(headerKey,headerValue);
+
+        this.pdfGeneratorService.export(response);
+    }
+}
